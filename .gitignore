@@ -1,0 +1,17 @@
+# Rust
+target/
+**/*.rs.bk
+
+# Noir bench folders
+noir-bench-bignum/
+noir-bench-sha256/
+noir-bench-sswu/
+
+# Noir build artifacts
+noir-circuit/target/
+
+# Static assets
+static/
+
+# Environment
+.env
