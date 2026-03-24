@@ -33,7 +33,16 @@ Client                              Server
 
 ## Core Innovation
 
-Standard SSWU hash-to-curve costs ~7,095 constraints inside a ZK circuit. We replace it with the **increment-and-check** construction from [Groth, Malvai, Miller & Zhang](https://eprint.iacr.org/2024/XXX), reducing map-to-curve to **~22 constraints** (~300x reduction).
+We replace standard SSWU hash-to-curve with the **increment-and-check** construction from [Groth, Malvai, Miller & Zhang](https://eprint.iacr.org/2024/XXX), reducing map-to-curve to **~22 constraints**.
+
+|  | SSWU (standard) | Ours (increment-and-check) |
+|---|---|---|
+| Hash-to-field | 4× SHA-256 for XMD (~134K gates) | 1× SHA-256 (~33K gates) |
+| Map-to-curve | 2× SSWU + 2× iso + EC add (~11K gates) | ~22 constraints |
+| **Hash-to-curve total** | **~145K gates** | **~33K gates** |
+| **Full OPRF circuit** | **~307K gates → 2^19** | **197,599 gates → 2^18** |
+
+Barretenberg pads circuits to the next power of two for NTT. Crossing from 2^18 to 2^19 **doubles** SRS size, proving memory, and FFT work. On resource-constrained clients (phones, tablets, in-browser provers), this can be the difference between a proof completing and an OOM crash.
 
 The full circuit proves 5 relations in a single proof:
 
@@ -53,7 +62,8 @@ The full circuit proves 5 relations in a single proof:
 | UltraHonk gates | 197,599 |
 | Proof system | Barretenberg UltraHonk |
 | Curve | secp256k1 (non-native over BN254) |
-| Map-to-curve constraints | ~22 (vs ~7,095 for SSWU) |
+| Map-to-curve constraints | ~22 (vs ~145K full SSWU hash-to-curve) |
+| Dyadic circuit size | 2^18 (vs 2^19 with SSWU) |
 
 ## Advantages Over Semaphore
 
